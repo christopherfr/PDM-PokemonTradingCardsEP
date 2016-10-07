@@ -18,14 +18,14 @@
             android:id="@+id/butMisPokemonesDashboard"
             android:layout_width="match_parent"
             android:layout_height="100sp"
-            android:text="@string/text_button_mispokemones"/>
+            android:text="@string/text_button_mipokedex"/>
 
         <Button
             android:id="@+id/butPokemonesDisponiblesDashboard"
             android:layout_width="match_parent"
             android:layout_height="100sp"
             android:layout_below="@+id/butMisPokemonesDashboard"
-            android:text="@string/text_button_pokemonesdisponibles"/>
+            android:text="@string/text_button_atrapar"/>
 
     </RelativeLayout>
 
