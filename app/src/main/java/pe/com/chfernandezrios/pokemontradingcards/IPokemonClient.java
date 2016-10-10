@@ -26,7 +26,7 @@ public interface IPokemonClient {
     Call<List<Integer>> obtenerMisPokemones(@Path("id_usuario") int id);
 
     @GET("pokemones/{id_pokemon}")
-    Call<PokemonResponse> obtenerDatosPokemon(@Path("id_pokmeon") int id);
+    Call<PokemonResponse> obtenerDatosPokemon(@Path("id_pokemon") int id);
 
     @GET("disponibles")
     Call<List<Integer>> obtenerPokemonesDisponibles();
