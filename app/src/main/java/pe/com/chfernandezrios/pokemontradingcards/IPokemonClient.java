@@ -13,8 +13,6 @@ import retrofit2.http.Path;
  * Created by chfernandezrios on 2/10/2016.
  */
 public interface IPokemonClient {
-    // Request method and URL specified in the annotation
-    // Callback for the parsed response is the last parameter
 
     @POST("usuarios/login")
     Call<LoginResponse> logIn(@Body LoginRequest loginRequest);
