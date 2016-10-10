@@ -11,16 +11,16 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.List;
 import android.os.Handler;
 
 import pe.com.chfernandezrios.pokemontradingcards.beans.Pokemon;
+import pe.com.chfernandezrios.pokemontradingcards.beans.responses.PokemonResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MispokemonesActivity extends AppCompatActivity {
+public class PokedexActivity extends AppCompatActivity {
     private ImageView iviPokemon;
     private TextView tviNombrePokemon;
     private TextView tviNivelPokemon;
@@ -29,7 +29,7 @@ public class MispokemonesActivity extends AppCompatActivity {
 
     private int id;
     private int elemento = 0;
-    private List<Pokemon> misPokemones;
+    private List<Integer> misPokemones;
     IPokemonClient client;
     Handler handler;
 
@@ -57,7 +57,7 @@ public class MispokemonesActivity extends AppCompatActivity {
         // Handler del hilo principal
         handler = new Handler();
 
-        // Cliente REST
+        // Cliente REST Pokemon
         client = ServiceGenerator.createService(IPokemonClient.class);
 
         // Obtener mis pokemones y cargarlos
@@ -82,7 +82,7 @@ public class MispokemonesActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.putExtra("ID", id);
-                intent.setClass(MispokemonesActivity.this, DashboardActivity.class);
+                intent.setClass(PokedexActivity.this, DashboardActivity.class);
                 startActivity(intent);
             }
         });
@@ -107,16 +107,16 @@ public class MispokemonesActivity extends AppCompatActivity {
         new Thread() {
             @Override
             public void run() {*/
-        client.obtenerMisPokemones(id).enqueue(new Callback<List<Pokemon>>() {
+        client.obtenerMisPokemones(id).enqueue(new Callback<List<Integer>>() {
             @Override
-            public void onResponse(Call<List<Pokemon>> call, Response<List<Pokemon>> response) {
+            public void onResponse(Call<List<Integer>> call, Response<List<Integer>> response) {
                 misPokemones = response.body();
 
                 // Si es nula o está vacía
                 if (misPokemones == null || misPokemones.size() == 0) {
                     Intent intent = new Intent();
                     intent.putExtra("ID", id);
-                    intent.setClass(MispokemonesActivity.this, DashboardActivity.class);
+                    intent.setClass(PokedexActivity.this, DashboardActivity.class);
                     startActivity(intent);
                     Toast.makeText(getBaseContext(), "Usted no tiene pokemones", Toast.LENGTH_SHORT).show();
                 }
@@ -125,10 +125,10 @@ public class MispokemonesActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<Pokemon>> call, Throwable t) {
+            public void onFailure(Call<List<Integer>> call, Throwable t) {
                 Intent intent = new Intent();
                 intent.putExtra("ID", id);
-                intent.setClass(MispokemonesActivity.this, DashboardActivity.class);
+                intent.setClass(PokedexActivity.this, DashboardActivity.class);
                 startActivity(intent);
                 Toast.makeText(getBaseContext(), "No se pudo obtener sus pokemones", Toast.LENGTH_SHORT).show();
             }
@@ -138,19 +138,39 @@ public class MispokemonesActivity extends AppCompatActivity {
         }.start();*/
     }
 
-    private void cargarDatosPokemon(final Pokemon pokemon) {
-        Picasso.with(getApplicationContext()).load(pokemon.getUrl()).into(iviPokemon);
-        // UI en nuevo hilo
-        handler.post(new Thread() {
+    private void cargarDatosPokemon(final int pokemonId) {
+        // Obtener datos
+
+        client.obtenerDatosPokemon(pokemonId).enqueue(new Callback<PokemonResponse>() {
             @Override
-            public void run() {
-                // Cargar views
-                tviNombrePokemon.setText(pokemon.getNombre());
-                tviNivelPokemon.setText(String.valueOf(pokemon.getNivel()));
-                tviTipoPokemon.setText(pokemon.getTipo());
-                tviDescripcionPokemon.setText(pokemon.getDescripcion());
+            public void onResponse(Call<PokemonResponse> call, Response<PokemonResponse> response) {
+                final PokemonResponse pokemonResponse = response.body();
+
+                Picasso.with(getApplicationContext()).load(pokemonResponse.getUrl()).into(iviPokemon);
+
+                // UI en nuevo hilo
+                handler.post(new Thread() {
+                    @Override
+                    public void run() {
+                        // Cargar views
+                        tviNombrePokemon.setText(pokemonResponse.getNombre());
+                        tviNivelPokemon.setText(String.valueOf(pokemonResponse.getNivel()));
+                        tviTipoPokemon.setText(pokemonResponse.getTipo());
+                        tviDescripcionPokemon.setText(pokemonResponse.getDescripcion());
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call<PokemonResponse> call, Throwable t) {
+                Intent intent = new Intent();
+                intent.putExtra("ID", id);
+                intent.setClass(PokedexActivity.this, DashboardActivity.class);
+                startActivity(intent);
+                Toast.makeText(getBaseContext(), "No se pudo cargar los datos del pokemon", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     @Override

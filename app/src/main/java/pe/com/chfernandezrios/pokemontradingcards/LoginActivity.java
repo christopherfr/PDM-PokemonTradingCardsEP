@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.IOException;
-import pe.com.chfernandezrios.pokemontradingcards.beans.Usuario;
+
 import pe.com.chfernandezrios.pokemontradingcards.beans.responses.LoginRequest;
 import pe.com.chfernandezrios.pokemontradingcards.beans.responses.LoginResponse;
 import retrofit2.Call;

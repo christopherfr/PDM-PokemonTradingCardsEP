@@ -9,14 +9,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class ServiceGenerator {
 
-    public static final String API_BASE_URL = "https://ul-pokemon.herokuapp.com/";
-
+    public static final String SERVICIO_POKEMON_URL = "https://pokemonservice.herokuapp.com/";
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-
-    private static Retrofit.Builder builder = new Retrofit.Builder().baseUrl(API_BASE_URL).addConverterFactory(GsonConverterFactory.create());
+    private static Retrofit.Builder servicioPokemonBuilder = new Retrofit.Builder().baseUrl(SERVICIO_POKEMON_URL).addConverterFactory(GsonConverterFactory.create());
 
     public static <S> S createService(Class<S> serviceClass) {
-        Retrofit retrofit = builder.client(httpClient.build()).build();
+        Retrofit retrofit = null;
+
+        retrofit = servicioPokemonBuilder.client(httpClient.build()).build();
+
         return retrofit.create(serviceClass);
     }
 }

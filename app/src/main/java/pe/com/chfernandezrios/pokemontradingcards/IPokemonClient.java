@@ -2,7 +2,6 @@ package pe.com.chfernandezrios.pokemontradingcards;
 
 import java.util.List;
 
-import pe.com.chfernandezrios.pokemontradingcards.beans.Pokemon;
 import pe.com.chfernandezrios.pokemontradingcards.beans.responses.*;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -21,9 +20,18 @@ public interface IPokemonClient {
     Call<LoginResponse> logIn(@Body LoginRequest loginRequest);
 
     @POST("usuarios")
-    Call<StatusResponse> registro(@Body RegistroRequest registroRequest);
+    Call<Status> registro(@Body RegistroRequest registroRequest);
 
     @GET("usuarios/{id_usuario}/pokemones")
-    Call<List<Pokemon>> obtenerMisPokemones(@Path("id_usuario") int id);
+    Call<List<Integer>> obtenerMisPokemones(@Path("id_usuario") int id);
+
+    @GET("pokemones/{id_pokemon}")
+    Call<PokemonResponse> obtenerDatosPokemon(@Path("id_pokmeon") int id);
+
+    @GET("disponibles")
+    Call<List<Integer>> obtenerPokemonesDisponibles();
+
+    @POST("pokemones/atrapar")
+    Call<Status> atraparPokemon(@Body AtraparRequest atraparRequest);
 
 }

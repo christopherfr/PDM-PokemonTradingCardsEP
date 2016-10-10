@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.List;
 
 import pe.com.chfernandezrios.pokemontradingcards.beans.Pokemon;
@@ -40,16 +39,16 @@ public class DashboardActivity extends AppCompatActivity {
         butMisPokemones.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                client.obtenerMisPokemones(id).enqueue(new Callback<List<Pokemon>>() {
+                client.obtenerMisPokemones(id).enqueue(new Callback<List<Integer>>() {
                     @Override
-                    public void onResponse(Call<List<Pokemon>> call, Response<List<Pokemon>> response) {
-                        List<Pokemon> misPokemones = response.body();
+                    public void onResponse(Call<List<Integer>> call, Response<List<Integer>> response) {
+                        List<Integer> misPokemones = response.body();
 
                         // Si la lista no es nula ni está vacía
                         if (misPokemones != null && misPokemones.size() > 0) {
                             Intent intent = new Intent();
                             intent.putExtra("ID", id);
-                            intent.setClass(DashboardActivity.this, MispokemonesActivity.class);
+                            intent.setClass(DashboardActivity.this, PokedexActivity.class);
                             startActivity(intent);
                         } else {
                             Toast.makeText(getBaseContext(), "Usted no tiene pokemones", Toast.LENGTH_SHORT).show();
@@ -57,7 +56,7 @@ public class DashboardActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<List<Pokemon>> call, Throwable t) {
+                    public void onFailure(Call<List<Integer>> call, Throwable t) {
                         Toast.makeText(getBaseContext(), "No se pudo obtener sus pokemones", Toast.LENGTH_SHORT).show();
                     }
                 });

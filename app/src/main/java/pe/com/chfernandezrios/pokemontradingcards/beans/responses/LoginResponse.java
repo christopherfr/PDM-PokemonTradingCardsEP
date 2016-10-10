@@ -7,10 +7,10 @@ import pe.com.chfernandezrios.pokemontradingcards.beans.Usuario;
  */
 public class LoginResponse {
     private String msg;
-    private StatusResponse status;
+    private Status status;
     private Usuario usuario;
 
-    public LoginResponse(String msg, StatusResponse status, Usuario usuario) {
+    public LoginResponse(String msg, Status status, Usuario usuario) {
         this.msg = msg;
         this.status = status;
         this.usuario = usuario;
@@ -24,11 +24,11 @@ public class LoginResponse {
         this.msg = msg;
     }
 
-    public StatusResponse getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(StatusResponse status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

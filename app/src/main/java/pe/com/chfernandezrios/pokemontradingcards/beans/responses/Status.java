@@ -3,11 +3,11 @@ package pe.com.chfernandezrios.pokemontradingcards.beans.responses;
 /**
  * Created by chfernandezrios on 2/10/2016.
  */
-public class StatusResponse {
+public class Status {
     private int code;
     private String msg;
 
-    public StatusResponse(int code, String msg) {
+    public Status(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }

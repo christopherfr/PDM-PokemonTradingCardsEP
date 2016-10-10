@@ -8,12 +8,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.IOException;
-
 import pe.com.chfernandezrios.pokemontradingcards.beans.Usuario;
-import pe.com.chfernandezrios.pokemontradingcards.beans.responses.LoginResponse;
 import pe.com.chfernandezrios.pokemontradingcards.beans.responses.RegistroRequest;
-import pe.com.chfernandezrios.pokemontradingcards.beans.responses.StatusResponse;
+import pe.com.chfernandezrios.pokemontradingcards.beans.responses.Status;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -66,12 +63,12 @@ public class RegistroActivity extends AppCompatActivity {
                                     )
                             );
 
-                            client.registro(registroRequest).enqueue(new Callback<StatusResponse>() {
+                            client.registro(registroRequest).enqueue(new Callback<Status>() {
                                 @Override
-                                public void onResponse(Call<StatusResponse> call, Response<StatusResponse> response) {
-                                    StatusResponse statusResponse = response.body();
-                                    // Si el StatusResponse no muestra errores
-                                    if (statusResponse.getCode() == 0 && statusResponse.getMsg() == null) {
+                                public void onResponse(Call<Status> call, Response<Status> response) {
+                                    Status status = response.body();
+                                    // Si el Status no muestra errores
+                                    if (status.getCode() == 0 && status.getMsg() == null) {
                                         // Realizar pase al Login
                                         Intent intent = new Intent();
                                         intent.setClass(RegistroActivity.this, LoginActivity.class);
@@ -83,7 +80,7 @@ public class RegistroActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onFailure(Call<StatusResponse> call, Throwable t) {
+                                public void onFailure(Call<Status> call, Throwable t) {
                                     Toast.makeText(getBaseContext(), "Error en el registro", Toast.LENGTH_SHORT).show();
                                 }
                             });
