@@ -7,20 +7,21 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="pe.com.chfernandezrios.pokemontradingcards.AtraparActivity">
+    tools:context=".CercanosActivity">
 
     <TextView
-        android:id="@+id/tviAtraparlo"
+        android:id="@+id/tviCercanos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/text_textview_atraparlo_atrapar"
+        android:text="@string/text_textview_cercanos_atrapar"
         android:textAlignment="center"
         android:textSize="45sp" />
 
-    <ImageView
-        android:id="@+id/iviPokemonAtraparlo"
-        android:layout_width="300sp"
-        android:layout_height="300sp"
-        android:layout_centerInParent="true"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/revPokemonesDisponibles"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tviCercanos"
+        android:scrollbars="vertical" />
 
 </RelativeLayout>

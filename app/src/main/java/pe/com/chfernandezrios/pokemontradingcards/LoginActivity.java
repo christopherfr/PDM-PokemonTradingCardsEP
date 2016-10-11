@@ -54,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
                             if (loginResponse.getMsg().equals("") && loginResponse.getUsuario() != null) {
                                 // Realizar pase al Dashboard mandando id obtenido
                                 Intent intent = new Intent();
-                                intent.putExtra("ID", loginResponse.getUsuario().getId());
+                                intent.putExtra("USUARIO_ID", loginResponse.getUsuario().getId());
                                 intent.setClass(LoginActivity.this, DashboardActivity.class);
                                 startActivity(intent);
                             } else {

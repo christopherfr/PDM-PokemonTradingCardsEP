@@ -23,4 +23,7 @@
     <string name="hint_edittext_usuario_registro">Ingrese usuario</string>
     <string name="hint_edittext_password_registro">Ingrese password</string>
     <string name="hint_edittext_rpassword_registro">Reingrese password</string>
+    <string name="text_textview_nombre_item_recyclerview">Nombre</string>
+    <string name="text_textview_cercanos_atrapar">Cercanos</string>
+    <string name="text_textview_atraparlo_atrapar">Atraparlo!</string>
 </resources>

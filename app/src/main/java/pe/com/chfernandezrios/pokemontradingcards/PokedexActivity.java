@@ -7,18 +7,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 import android.os.Handler;
 
-import pe.com.chfernandezrios.pokemontradingcards.beans.Pokemon;
-import pe.com.chfernandezrios.pokemontradingcards.beans.responses.PokemonResponse;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import pe.com.chfernandezrios.pokemontradingcards.beans.responses.Pokemon;
 
 public class PokedexActivity extends AppCompatActivity {
     private ImageView iviPokemon;
@@ -27,10 +23,9 @@ public class PokedexActivity extends AppCompatActivity {
     private TextView tviTipoPokemon;
     private TextView tviDescripcionPokemon;
 
-    private int id;
+    private int usuarioId;
     private int elemento = 0;
-    private List<Integer> misPokemones;
-    IPokemonClient client;
+    private List<Pokemon> misPokemones;
     Handler handler;
 
     @Override
@@ -51,17 +46,15 @@ public class PokedexActivity extends AppCompatActivity {
         // Obtener el intent que condujo aquí
         Intent dasboardIntent = getIntent();
 
-        // Obtener el id del usuario mandado en el intent
-        id = dasboardIntent.getIntExtra("ID", 0);
+        // Obtener el usuarioId del usuario mandado en el intent
+        usuarioId = dasboardIntent.getIntExtra("USUARIO_ID", 0);
 
-        // Handler del hilo principal
+        // Obtener la lista de pokemones capturados del usuario enviada en el intent
+        misPokemones = dasboardIntent.getParcelableArrayListExtra("LISTA_POKEMONES_CAPTURADOS");
+
+        // Handler del hilo principal y carga de elementos gráficos
         handler = new Handler();
-
-        // Cliente REST Pokemon
-        client = ServiceGenerator.createService(IPokemonClient.class);
-
-        // Obtener mis pokemones y cargarlos
-        obtenerMisPokemones();
+        cargarViews();
 
         // Cuando se haga click en <<
         butAnterior.setOnClickListener(new View.OnClickListener() {
@@ -72,7 +65,7 @@ public class PokedexActivity extends AppCompatActivity {
                 } else {
                     elemento--;
                 }
-                cargarDatosPokemon(misPokemones.get(elemento));
+                cargarViews();
             }
         });
 
@@ -81,7 +74,9 @@ public class PokedexActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.putExtra("ID", id);
+                intent.putExtra("USUARIO_ID", usuarioId);
+                intent.putParcelableArrayListExtra("LISTA_POKEMONES_CAPTURADOS", (ArrayList<Pokemon>) misPokemones);
+                intent.putExtra("POKEDEX_ACTIVITY", true);
                 intent.setClass(PokedexActivity.this, DashboardActivity.class);
                 startActivity(intent);
             }
@@ -96,98 +91,43 @@ public class PokedexActivity extends AppCompatActivity {
                 } else {
                     elemento++;
                 }
-                cargarDatosPokemon(misPokemones.get(elemento));
+                cargarViews();
             }
         });
     }
 
-    private void obtenerMisPokemones() {
-        /*
-        // Conexión remota en nuevo hilo
-        new Thread() {
-            @Override
-            public void run() {*/
-        client.obtenerMisPokemones(id).enqueue(new Callback<List<Integer>>() {
-            @Override
-            public void onResponse(Call<List<Integer>> call, Response<List<Integer>> response) {
-                misPokemones = response.body();
+    private void cargarViews() {
+        final Pokemon pokemonActual = misPokemones.get(elemento);
 
-                // Si es nula o está vacía
-                if (misPokemones == null || misPokemones.size() == 0) {
-                    Intent intent = new Intent();
-                    intent.putExtra("ID", id);
-                    intent.setClass(PokedexActivity.this, DashboardActivity.class);
-                    startActivity(intent);
-                    Toast.makeText(getBaseContext(), "Usted no tiene pokemones", Toast.LENGTH_SHORT).show();
-                }
+        Picasso.with(getApplicationContext()).load(pokemonActual.getUrl()).into(iviPokemon);
 
-                cargarDatosPokemon(misPokemones.get(elemento));
-            }
-
+        // UI en nuevo hilo
+        handler.post(new Thread() {
             @Override
-            public void onFailure(Call<List<Integer>> call, Throwable t) {
-                Intent intent = new Intent();
-                intent.putExtra("ID", id);
-                intent.setClass(PokedexActivity.this, DashboardActivity.class);
-                startActivity(intent);
-                Toast.makeText(getBaseContext(), "No se pudo obtener sus pokemones", Toast.LENGTH_SHORT).show();
+            public void run() {
+                // Cargar views
+                tviNombrePokemon.setText(pokemonActual.getNombre());
+                tviNivelPokemon.setText(String.valueOf(pokemonActual.getNivel()));
+                tviTipoPokemon.setText(pokemonActual.getTipo());
+                tviDescripcionPokemon.setText(pokemonActual.getDescripcion());
             }
         });
-        /*
-            }
-        }.start();*/
-    }
-
-    private void cargarDatosPokemon(final int pokemonId) {
-        // Obtener datos
-
-        client.obtenerDatosPokemon(pokemonId).enqueue(new Callback<PokemonResponse>() {
-            @Override
-            public void onResponse(Call<PokemonResponse> call, Response<PokemonResponse> response) {
-                final PokemonResponse pokemonResponse = response.body();
-
-                Picasso.with(getApplicationContext()).load(pokemonResponse.getUrl()).into(iviPokemon);
-
-                // UI en nuevo hilo
-                handler.post(new Thread() {
-                    @Override
-                    public void run() {
-                        // Cargar views
-                        tviNombrePokemon.setText(pokemonResponse.getNombre());
-                        tviNivelPokemon.setText(String.valueOf(pokemonResponse.getNivel()));
-                        tviTipoPokemon.setText(pokemonResponse.getTipo());
-                        tviDescripcionPokemon.setText(pokemonResponse.getDescripcion());
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Call<PokemonResponse> call, Throwable t) {
-                Intent intent = new Intent();
-                intent.putExtra("ID", id);
-                intent.setClass(PokedexActivity.this, DashboardActivity.class);
-                startActivity(intent);
-                Toast.makeText(getBaseContext(), "No se pudo cargar los datos del pokemon", Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("ID", id);
+        outState.putInt("USUARIO_ID", usuarioId);
+        outState.putParcelableArrayList("LISTA_POKEMONES_CAPTURADOS", (ArrayList<Pokemon>) misPokemones);
         outState.putInt("ELEMENTO", elemento);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        id = savedInstanceState.getInt("ID");
+        usuarioId = savedInstanceState.getInt("USUARIO_ID");
+        misPokemones = savedInstanceState.getParcelableArrayList("LISTA_POKEMONES_CAPTURADOS");
         elemento = savedInstanceState.getInt("ELEMENTO");
-        // Obtener mis pokemones y cargarlos
-        // Lo ideal sería guardar la lista de pokemones obtenida antes
-        // y recuperarla aquí, pero no sé cómo meter un Collection en el Bundle
-        obtenerMisPokemones();
+        cargarViews();
     }
 }

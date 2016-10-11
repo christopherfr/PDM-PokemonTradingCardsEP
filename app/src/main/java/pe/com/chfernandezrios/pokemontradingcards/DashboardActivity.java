@@ -7,15 +7,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import pe.com.chfernandezrios.pokemontradingcards.beans.Pokemon;
+import pe.com.chfernandezrios.pokemontradingcards.beans.PokemonDisponible;
+import pe.com.chfernandezrios.pokemontradingcards.beans.responses.Pokemon;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class DashboardActivity extends AppCompatActivity {
-    private int id;
+    private List<Pokemon> misPokemones;
+    private List<PokemonDisponible> pokemonesDisponibles;
+    private int usuarioId;
+    private boolean intentProvieneDePokedexActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,34 +37,45 @@ public class DashboardActivity extends AppCompatActivity {
         // Obtener el intent que condujo aquí
         Intent anteriorIntent = getIntent();
 
-        // Obtener el id del usuario mandado en el intent
-        id = anteriorIntent.getIntExtra("ID", 0);
+        // Obtener el usuarioId del usuario enviado en el intent
+        usuarioId = anteriorIntent.getIntExtra("USUARIO_ID", 0);
+
+        // Obtener el flag que indica si el intent viene desde PokedexActivity
+        intentProvieneDePokedexActivity = !anteriorIntent.getBooleanExtra("POKEDEX_ACTIVITY", false);
+
+        if (intentProvieneDePokedexActivity) {
+            // Obtener la lista de pokemones capturados enviado en el intent
+            pokemonesDisponibles = anteriorIntent.getParcelableArrayListExtra("LISTA_POKEMONES_CAPTURADOS");
+        }
 
         // Cuando se haga click en el botón Mis Pokemones
         butMisPokemones.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                client.obtenerMisPokemones(id).enqueue(new Callback<List<Integer>>() {
-                    @Override
-                    public void onResponse(Call<List<Integer>> call, Response<List<Integer>> response) {
-                        List<Integer> misPokemones = response.body();
-
-                        // Si la lista no es nula ni está vacía
-                        if (misPokemones != null && misPokemones.size() > 0) {
-                            Intent intent = new Intent();
-                            intent.putExtra("ID", id);
-                            intent.setClass(DashboardActivity.this, PokedexActivity.class);
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(getBaseContext(), "Usted no tiene pokemones", Toast.LENGTH_SHORT).show();
+                if (pokemonesDisponibles == null) {
+                    Toast.makeText(getBaseContext(), "Esto puede tomar minutos, vaya a por una taza de café", Toast.LENGTH_LONG).show();
+                    client.obtenerMisPokemones(usuarioId).enqueue(new Callback<List<Pokemon>>() {
+                        @Override
+                        public void onResponse(Call<List<Pokemon>> call, Response<List<Pokemon>> response) {
+                            if (response.isSuccessful()) {
+                                misPokemones = response.body();
+                                // Si la lista no es nula ni está vacía
+                                if (misPokemones != null && misPokemones.size() > 0) {
+                                    pasarAPokedexActivity();
+                                } else {
+                                    Toast.makeText(getBaseContext(), "Usted no tiene pokemones", Toast.LENGTH_SHORT).show();
+                                }
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<List<Integer>> call, Throwable t) {
-                        Toast.makeText(getBaseContext(), "No se pudo obtener sus pokemones", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<List<Pokemon>> call, Throwable t) {
+                            Toast.makeText(getBaseContext(), "No se pudo obtener sus pokemones", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    pasarAPokedexActivity();
+                }
             }
         });
 
@@ -67,20 +83,58 @@ public class DashboardActivity extends AppCompatActivity {
         butPokemonesDisponibles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getBaseContext(), "Funcionalidad aún no implementada", Toast.LENGTH_SHORT).show();
+                client.obtenerPokemonesDisponibles().enqueue(new Callback<List<PokemonDisponible>>() {
+                    @Override
+                    public void onResponse(Call<List<PokemonDisponible>> call, Response<List<PokemonDisponible>> response) {
+                        if (response.isSuccessful()) {
+                            pokemonesDisponibles = response.body();
+                            // Si la lista no es nula ni está vacía
+                            if (pokemonesDisponibles != null && pokemonesDisponibles.size() > 0) {
+                                Intent intent = new Intent();
+                                intent.putExtra("USUARIO_ID", usuarioId);
+                                intent.putParcelableArrayListExtra("LISTA_POKEMONES_DISPONIBLES", (ArrayList<PokemonDisponible>) pokemonesDisponibles);
+                                intent.setClass(DashboardActivity.this, CercanosActivity.class);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(getBaseContext(), "No hay pokemones disponibles en este momento", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            onFailure(call, new Exception());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<PokemonDisponible>> call, Throwable t) {
+                        Toast.makeText(getBaseContext(), "No se pudo obtener los pokemones disponibles", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
+    }
+
+    private void pasarAPokedexActivity () {
+        Intent intent = new Intent();
+        intent.putParcelableArrayListExtra("LISTA_POKEMONES_CAPTURADOS", (ArrayList<Pokemon>) misPokemones);
+        intent.putExtra("USUARIO_ID", usuarioId);
+        intent.setClass(DashboardActivity.this, PokedexActivity.class);
+        startActivity(intent);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("ID", id);
+        outState.putParcelableArrayList("LISTA_POKEMONES_CAPTURADOS", (ArrayList<Pokemon>) misPokemones);
+        outState.putParcelableArrayList("LISTA_POKEMONES_DISPONIBLES", (ArrayList<PokemonDisponible>) pokemonesDisponibles);
+        outState.putInt("USUARIO_ID", usuarioId);
+        outState.putBoolean("POKEDEX_ACTIVITY", intentProvieneDePokedexActivity);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        id = savedInstanceState.getInt("ID");
+        misPokemones = savedInstanceState.getParcelableArrayList("LISTA_POKEMONES_CAPTURADOS");
+        pokemonesDisponibles = savedInstanceState.getParcelableArrayList("LISTA_POKEMONES_DISPONIBLES");
+        usuarioId = savedInstanceState.getInt("USUARIO_ID");
+        intentProvieneDePokedexActivity = savedInstanceState.getBoolean("POKEDEX_ACTIVITY");
     }
 }

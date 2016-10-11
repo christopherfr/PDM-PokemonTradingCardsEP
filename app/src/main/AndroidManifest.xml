@@ -21,6 +21,7 @@
         <activity android:name=".RegistroActivity" />
         <activity android:name=".DashboardActivity" />
         <activity android:name=".PokedexActivity" />
+        <activity android:name=".CercanosActivity" />
         <activity android:name=".AtraparActivity"></activity>
     </application>
 
