@@ -79,6 +79,7 @@ public class PokedexActivity extends AppCompatActivity {
                 intent.putExtra("POKEDEX_ACTIVITY", true);
                 intent.setClass(PokedexActivity.this, DashboardActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 

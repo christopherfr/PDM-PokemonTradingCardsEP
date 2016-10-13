@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,10 @@ public class CercanosActivity extends AppCompatActivity implements RecyclerViewC
         // Obtener la lista de pokemones disponibles enviada en el intent
         pokemonesDisponibles = anteriorIntent.getParcelableArrayListExtra("LISTA_POKEMONES_DISPONIBLES");
 
+        if (pokemonesDisponibles == null || pokemonesDisponibles.isEmpty()) {
+            Toast.makeText(getBaseContext(), "No hay pokemones disponibles en este momento", Toast.LENGTH_SHORT).show();
+        }
+
         RecyclerView.Adapter revPokemonesDisponiblesAdapter = new CercanosAdapter(getApplicationContext(), pokemonesDisponibles, this);
         revPokemonesDisponibles.setAdapter(revPokemonesDisponiblesAdapter);
     }
@@ -45,6 +50,7 @@ public class CercanosActivity extends AppCompatActivity implements RecyclerViewC
         intent.putExtra("USUARIO_ID", usuarioId);
         intent.setClass(CercanosActivity.this, AtraparActivity.class);
         startActivity(intent);
+        finish();
     }
 
     @Override

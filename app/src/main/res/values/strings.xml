@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pokemon Trading Cards</string>
+    <string name="app_name">PDM-EP</string>
     <string name="Pokemon">Pokemon</string>
     <string name="TradingCards">Trading cards</string>
     <string name="hint_edittext_username">Ingrese usuario</string>

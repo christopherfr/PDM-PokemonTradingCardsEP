@@ -74,6 +74,7 @@ public class RegistroActivity extends AppCompatActivity {
                                         intent.setClass(RegistroActivity.this, LoginActivity.class);
                                         startActivity(intent);
                                         Toast.makeText(getBaseContext(), "Registro correcto", Toast.LENGTH_SHORT).show();
+                                        finish();
                                     } else {
                                         Toast.makeText(getBaseContext(), "Error en el registro", Toast.LENGTH_SHORT).show();
                                     }

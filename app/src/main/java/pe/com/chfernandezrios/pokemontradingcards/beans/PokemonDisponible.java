@@ -21,7 +21,7 @@ public class PokemonDisponible implements Parcelable {
     private PokemonDisponible(Parcel in) {
         this.pokemonId = in.readInt();
         this.pokemonNombre = in.readString();
-        this.pokemonNombre = in.readString();
+        this.pokemonImagenUrl = in.readString();
     }
 
     public static final Parcelable.Creator<PokemonDisponible> CREATOR = new Creator<PokemonDisponible>() {

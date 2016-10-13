@@ -58,11 +58,19 @@ public class AtraparActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<Status> call, Response<Status> response) {
                         if (response.isSuccessful()) {
+                            Status status = response.body();
+
+                            if (status.getCode() == 0) {
+                                Toast.makeText(getBaseContext(), pokemonDisponible.getPokemonNombre() + " capturado", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getBaseContext(), "No se pudo capturar al pokemon", Toast.LENGTH_SHORT).show();
+                            }
+
                             Intent intent = new Intent();
                             intent.putExtra("USUARIO_ID", usuarioId);
                             intent.setClass(AtraparActivity.this, DashboardActivity.class);
                             startActivity(intent);
-                            Toast.makeText(getBaseContext(), pokemonDisponible.getPokemonNombre() + " capturado", Toast.LENGTH_SHORT).show();
+                            finish();
                         } else {
                             Toast.makeText(getBaseContext(), "No se pudo capturar al pokemon", Toast.LENGTH_SHORT).show();
                         }
